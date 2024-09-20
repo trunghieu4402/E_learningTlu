@@ -54,13 +54,14 @@ public class CourseSemesterGroupService implements CourseSemesterGroupServiceImp
         }
         Course course = this.courseRepository.findById(CourseSGDto.getCourseId()).get();
         Semester_Group semesterGroup = this.semesterGroupRepository.findById(CourseSGDto.getSemesterGroupId()).get();
-        Course_SemesterGroup courseSemesterGroup = this.mapper.map(course,Course_SemesterGroup.class);
+        Course_SemesterGroup courseSemesterGroup = new Course_SemesterGroup();
         courseSemesterGroup.setCourseSemesterGroupId(course.getCourseId()+"_"+semesterGroup.getSemesterGroupId());
+        courseSemesterGroup.setCourse(course);
+        courseSemesterGroup.setSemesterGroup(semesterGroup);
         if(this.courseSemesterGroupRepository.findById(courseSemesterGroup.getCourseSemesterGroupId()).isPresent())
         {
             return new ResponseEntity<>(CourseSGDto.getSemesterGroupId()+"da co mon: "+CourseSGDto.getCourseId(),HttpStatus.CONFLICT);
         }
-        courseSemesterGroup.setSemesterGroup(semesterGroup);
         return new ResponseEntity<>(this.courseSemesterGroupRepository.save(courseSemesterGroup),HttpStatus.OK);
     }
     public ResponseEntity<?> getAllBySemesterGroup(String id)

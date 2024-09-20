@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/Department")
+@RequestMapping("admin/Department")
 public class DepartmentController {
     @Autowired
     private DepartmentServiceImp departmentServiceImp;

@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class Schedule {
     @Autowired
     private SemesterGroupServiceImpl semesterGroupService;
-@Scheduled(cron ="0 0 0 * * ?")
+@Scheduled(cron ="0 0 * * * ?")
     public void AutoUpdateTimeTableForStudent() {
         semesterGroupService.AutoUpdate();
     }

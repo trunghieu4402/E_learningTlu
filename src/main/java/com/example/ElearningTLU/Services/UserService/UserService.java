@@ -439,4 +439,15 @@ public class UserService implements UserServiceImpl{
         InformationResponse response= this.mapper.map(student,InformationResponse.class);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
+    public ResponseEntity<?> getAllTeacher()
+    {
+        List<Person>teacherList=this.personRepository.findAllPersonByRole(Role.TEACHER.name()).get();
+        List<TeacherDto> TeacherDtos= new ArrayList<>();
+        for(Person person:teacherList)
+        {
+            TeacherDto teacherDto =this.mapper.map(person,TeacherDto.class);
+            TeacherDtos.add(teacherDto);
+        }
+        return new ResponseEntity<>(TeacherDtos,HttpStatus.OK);
+    }
 }

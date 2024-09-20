@@ -1,16 +1,16 @@
-package com.example.ElearningTLU.Controllers.MessageController;
-
-public class Greeting {
-    private String content;
-
-    public Greeting() {
-    }
-
-    public Greeting(String content) {
-        this.content = content;
-    }
-
-    public String getContent() {
-        return content;
-    }
-}
+//package com.example.ElearningTLU.Controllers.MessageController;
+//
+//public class Greeting {
+//    private String content;
+//
+//    public Greeting() {
+//    }
+//
+//    public Greeting(String content) {
+//        this.content = content;
+//    }
+//
+//    public String getContent() {
+//        return content;
+//    }
+//}

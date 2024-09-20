@@ -16,6 +16,7 @@ public interface UserServiceImpl {
     public ResponseEntity<?> createTeacher(TeacherDto dto);
 
     public ResponseEntity<?> getTeacherById(String id);
+    public ResponseEntity<?> getAllTeacher();
 
     public ResponseEntity<?> getTrainingProgram(String username);
 

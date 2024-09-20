@@ -61,6 +61,11 @@ public class UserController {
     {
         return userService.getTeacherById(id);
     }
+    @GetMapping("getAllTeacher")
+    public  ResponseEntity<?> getAllTeacher()
+    {
+        return this.userService.getAllTeacher();
+    }
 
 
 }

@@ -10,4 +10,6 @@ public interface CourseServiceImpl {
     public ResponseEntity<?> deleteCourse(String id);
     public ResponseEntity<?> updateCourse(CourseRequest courseRequest);
     public ResponseEntity<?> getCourseByMajorId(String id);
+    public ResponseEntity<?> getCourseByDepartmentId(String id);
+    public ResponseEntity<?>getAllCourseBase();
 }

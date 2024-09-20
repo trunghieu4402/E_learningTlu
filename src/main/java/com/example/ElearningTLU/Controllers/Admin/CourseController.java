@@ -33,6 +33,11 @@ public class CourseController {
     {
         return this.courseService.getCourseByMajorId(id);
     }
+    @GetMapping("/getAllCoursebyDepartment")
+    private ResponseEntity<?> getByDepartmentId(@Param("id") String id)
+    {
+        return this.courseService.getCourseByDepartmentId(id);
+    }
     @DeleteMapping("/deleteCourse")
     private ResponseEntity<?> deleteById(@Param("id") String id)
     {
@@ -44,6 +49,11 @@ public class CourseController {
     private ResponseEntity<?> update(@RequestBody CourseRequest courseRequest)
     {
         return this.courseService.updateCourse(courseRequest);
+    }
+    @GetMapping("/getAllBaseCourse")
+    public  ResponseEntity<?>getbase()
+    {
+        return this.courseService.getAllCourseBase();
     }
 
 }

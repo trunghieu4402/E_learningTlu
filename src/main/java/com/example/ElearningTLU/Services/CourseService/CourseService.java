@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,7 @@ public class CourseService implements CourseServiceImpl{
             private CourseSemesterGroupRepository courseSemesterGroupRepository;
     @Autowired
             private SemesterGroupRepository semesterGroupRepository;
+
 
     @Autowired
             private BaseCourseRepository baseCourseRepository;
@@ -349,7 +351,29 @@ public class CourseService implements CourseServiceImpl{
         {
             return new ResponseEntity<>("Nganh Khong Ton Tai",HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(this.majorRepository.findById(id), HttpStatus.OK);
+        Major major = this.majorRepository.findById(id).get();
+        List<Course> courseList= new ArrayList<>();
+        for (CourseMajor course:major.getCourses())
+        {
+            courseList.add(course.getCourse());
+        }
+        return new ResponseEntity<>(courseList, HttpStatus.OK);
+    }
+    public ResponseEntity<?> getCourseByDepartmentId(String id)
+    {
+        Department department = this.departmentRepository.findById(id).get();
+        List<Course> courseList= new ArrayList<>();
+        for (CourseDepartment course:department.getCourses())
+        {
+            courseList.add(course.getCourse());
+        }
+        return new ResponseEntity<>(courseList,HttpStatus.OK);
+    }
+    public ResponseEntity<?> getAllCourseBase()
+    {
+        List<BaseCourse> baseCourse= new ArrayList<>();
+        baseCourse=this.baseCourseRepository.findAll();
+        return new ResponseEntity<>(baseCourse,HttpStatus.OK);
     }
 
 }

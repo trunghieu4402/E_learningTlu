@@ -4,6 +4,7 @@ import com.example.ElearningTLU.Utils.JWTToken;
 import com.example.ElearningTLU.Services.RegisterService.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+//import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 public class RegisterController {
     @Autowired
     private RegisterService registerService;
+//    @Autowired
+//    private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private JWTToken token;
 
@@ -27,12 +30,14 @@ public class RegisterController {
         return this.registerService.removeClassRoom(person,classRoomId);
 
     }
+
     @GetMapping("")
     public ResponseEntity<?> getAll()
     {
         String perId= this.token.getUser();
         return this.registerService.getAllCLass(perId);
     }
+
     @GetMapping("/getRegister")
     public ResponseEntity<?> getPreSchedule()
     {

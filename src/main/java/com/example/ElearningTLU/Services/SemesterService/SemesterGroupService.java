@@ -1,5 +1,6 @@
 package com.example.ElearningTLU.Services.SemesterService;
 
+import com.example.ElearningTLU.Dto.Response.SemesterResponse;
 import com.example.ElearningTLU.Dto.SemesterGroupRequest;
 import com.example.ElearningTLU.Entity.GroupStudent;
 import com.example.ElearningTLU.Entity.Semester;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +41,7 @@ public class SemesterGroupService implements SemesterGroupServiceImpl{
         LocalDate now= LocalDate.now();
         Semester_Group lastSemesterGroup = new Semester_Group();
         long max= 0L;
-        List<Semester_Group> list =this.semesterGroupRepository.findByGroupAndYear(semesterGroupRequest.getGroupID(),now.getYear());
+        List<Semester_Group> list =this.semesterGroupRepository.findByGroupAndYear(semesterGroupRequest.getGroupId(),now.getYear());
         for(Semester_Group group: list)
         {
            long b =now.until(group.getFinish(),ChronoUnit.DAYS);
@@ -57,7 +59,7 @@ public class SemesterGroupService implements SemesterGroupServiceImpl{
 
         Semester_Group semesterGroup = new Semester_Group();
 //        semesterGroup.setSemesterGroupId();
-        GroupStudent groupStudent = this.groupStudentRepository.findById(semesterGroupRequest.getGroupID()).get();
+        GroupStudent groupStudent = this.groupStudentRepository.findById(semesterGroupRequest.getGroupId()).get();
         Semester semester = new Semester();
         List<Semester>semesterList = this.semesterRepository.findAll();
         for(int i=0;i<semesterList.size();i++)
@@ -85,7 +87,7 @@ public class SemesterGroupService implements SemesterGroupServiceImpl{
         semesterGroup.setGroup(groupStudent);
         semesterGroup.setStart(TimeStart);
         semesterGroup.setFinish(TimeEnd);
-        semesterGroup.setActive(false);
+        semesterGroup.setStatus(SemesterGroupStatus.SAPMO);
         if(TimeDK.until(LocalDate.now(),ChronoUnit.DAYS)>=0)
         {
             return new ResponseEntity<>("Thời Gian Mở Kỳ Học Không Phù Hợp", HttpStatus.CONFLICT);
@@ -106,7 +108,15 @@ public class SemesterGroupService implements SemesterGroupServiceImpl{
     }
     public ResponseEntity<?> getAllSemesterGroup()
     {
-        return new ResponseEntity<>(this.semesterGroupRepository.findAll(),HttpStatus.OK);
+        List<SemesterResponse> list = new ArrayList<>();
+        for (Semester_Group group:this.semesterGroupRepository.findAll())
+        {
+            SemesterResponse response = this.mapper.map(group,SemesterResponse.class);
+            response.setGroupId(group.getGroup().getGroupId());
+            response.setStatus(group.getStatus().name());
+            list.add(response);
+        }
+        return new ResponseEntity<>(list,HttpStatus.OK);
     }
     public ResponseEntity<?> getSemesterGroupById(String id)
     {
@@ -124,7 +134,7 @@ public class SemesterGroupService implements SemesterGroupServiceImpl{
         {
             return new ResponseEntity<>("Kỳ học không ton tai",HttpStatus.NOT_FOUND);
         }
-        if(semesterGroup.get().isActive())
+        if(semesterGroup.get().getStatus()!=SemesterGroupStatus.SAPMO)
         {
              return new ResponseEntity<>("Kỳ này không thể xóa",HttpStatus.BAD_REQUEST);
         }
@@ -133,83 +143,110 @@ public class SemesterGroupService implements SemesterGroupServiceImpl{
     }
     public ResponseEntity<?> updateSemesterGroup(SemesterGroupRequest semesterGroupRequest)
     {
-        Semester_Group semesterGroup = this.semesterGroupRepository.findById(semesterGroupRequest.getSemesterGroupId()).get();
-        if(semesterGroup.isActive())
-        {
-            return new ResponseEntity<>("Không the chỉnh sửa kỳ này",HttpStatus.BAD_REQUEST);
-        }
-        else
-        {
-            LocalDate TimeStart = LocalDate.parse(semesterGroupRequest.getStart());
-            LocalDate TimeEnd = LocalDate.parse(semesterGroupRequest.getEnd());
-            LocalDate TimeDK = LocalDate.parse(semesterGroupRequest.getTimeDKHoc());
-            if(TimeStart.until(LocalDate.now(),ChronoUnit.DAYS)>0 || TimeEnd.until(TimeStart,ChronoUnit.DAYS)>0)
-            {
-                return new ResponseEntity<>("Thời Gian Mở Kỳ Học Không Phù Hợp", HttpStatus.CONFLICT);
-            }
-            if(TimeDK.until(TimeStart, ChronoUnit.DAYS)<0)
-            {
-                return new ResponseEntity<>("Ngày đăng ký học phải trước ngày bắt đầu kỳ học mới", HttpStatus.CONFLICT);
-            }
-            if(TimeDK.until(LocalDate.now(),ChronoUnit.DAYS)==0)
-            {
-                semesterGroup.setActive(true);
-            }
-            else {
-                semesterGroup.setActive(false);
-            }
-            semesterGroup.setBaseCost(semesterGroupRequest.getBaseCost());
-            semesterGroup.setStart(LocalDate.parse(semesterGroupRequest.getStart()));
-            semesterGroup.setFinish(LocalDate.parse(semesterGroupRequest.getEnd()));
-            semesterGroup.setTimeDangKyHoc(LocalDate.parse(semesterGroupRequest.getTimeDKHoc()));
-             this.semesterGroupRepository.save(semesterGroup);
-             return new ResponseEntity<>("Cap Nhat Thanh cong",HttpStatus.OK);
-        }
+//        Semester_Group semesterGroup = this.semesterGroupRepository.findById(semesterGroupRequest.getSemesterGroupId()).get();
+//        if(semesterGroup.isActive())
+//        {
+//            return new ResponseEntity<>("Không the chỉnh sửa kỳ này",HttpStatus.BAD_REQUEST);
+//        }
+//        else
+//        {
+//            LocalDate TimeStart = LocalDate.parse(semesterGroupRequest.getStart());
+//            LocalDate TimeEnd = LocalDate.parse(semesterGroupRequest.getEnd());
+//            LocalDate TimeDK = LocalDate.parse(semesterGroupRequest.getTimeDKHoc());
+//            if(TimeStart.until(LocalDate.now(),ChronoUnit.DAYS)>0 || TimeEnd.until(TimeStart,ChronoUnit.DAYS)>0)
+//            {
+//                return new ResponseEntity<>("Thời Gian Mở Kỳ Học Không Phù Hợp", HttpStatus.CONFLICT);
+//            }
+//            if(TimeDK.until(TimeStart, ChronoUnit.DAYS)<0)
+//            {
+//                return new ResponseEntity<>("Ngày đăng ký học phải trước ngày bắt đầu kỳ học mới", HttpStatus.CONFLICT);
+//            }
+//            if(TimeDK.until(LocalDate.now(),ChronoUnit.DAYS)==0)
+//            {
+//                semesterGroup.setActive(true);
+//            }
+//            else {
+//                semesterGroup.setActive(false);
+//            }
+//            semesterGroup.setBaseCost(semesterGroupRequest.getBaseCost());
+//            semesterGroup.setStart(LocalDate.parse(semesterGroupRequest.getStart()));
+//            semesterGroup.setFinish(LocalDate.parse(semesterGroupRequest.getEnd()));
+//            semesterGroup.setTimeDangKyHoc(LocalDate.parse(semesterGroupRequest.getTimeDKHoc()));
+//             this.semesterGroupRepository.save(semesterGroup);
+//             return new ResponseEntity<>("Cap Nhat Thanh cong",HttpStatus.OK);
+//        }
+        return  new ResponseEntity<>(HttpStatus.OK);
     }
     public ResponseEntity<?> getAllSemesterGroupIsNonActive()
     {
         return new ResponseEntity<>(this.semesterGroupRepository.getAllSemesterGroupByActive(false),HttpStatus.OK);
     }
-    public void AutoUpdate() {
-        LocalDate date = LocalDate.of(2024,9,11).minusDays(1);
+    public void UpdateSemester() {
+        LocalDate date = LocalDate.now();
+        System.out.println(date);
         if (this.semesterGroupRepository.FindSemesterGroupByNowTime(date.toString()).isEmpty()) {
             return;
         }
-        Semester_Group semester_group = this.semesterGroupRepository.FindSemesterGroupByNowTime(date.toString()).get();
-        if(semester_group.isActive())
+        List<Semester_Group> semester_group = this.semesterGroupRepository.FindSemesterGroupByNowTime(date.toString());
+        for (Semester_Group group:semester_group)
         {
+            System.out.println(group.getSemesterGroupId());
+            if(group.getTimeDangKyHoc().equals(date))
+            {
+                System.out.println("Trước :"+group.getStatus());
+                group.setStatus(SemesterGroupStatus.DANGMO);
+                System.out.println("Sau :"+group.getStatus());
+                this.semesterGroupRepository.save(group);
+            }
+            System.out.println(group.getFinish().until(date,ChronoUnit.DAYS));
+            if(group.getFinish().until(date,ChronoUnit.DAYS)==1)
+            {
+                group.setStatus(SemesterGroupStatus.DAMO);
+                this.semesterGroupRepository.save(group);
+            }
+        }
+        }
+
+    public void UpdateTimeTable()
+    {
+        LocalDate date = LocalDate.now().minusDays(1);
+        System.out.println(date);
+        if (this.semesterGroupRepository.FindSemesterGroupByNowTime(date.toString()).isEmpty()) {
+            System.out.println("Chưa Hết Tg DK");
             return;
         }
-        semester_group.setActive(true);
-        this.semesterGroupRepository.save(semester_group);
-        System.out.println("Câp Nhat tai ngay: " + date + "//" + semester_group.getSemesterGroupId());
-        List<Class> classList = this.classRepository.getAllClassBySemesterId(semester_group.getSemesterGroupId());
-        for (Class aClass : classList) {
-            TimeTable tbTeacher = new TimeTable();
-            tbTeacher.setPerson(aClass.getTeacher());
-            tbTeacher.setSemesterGroupId(aClass.getSemesterGroupId());
-            tbTeacher.setRoomId(aClass.getRoom().getRoomId());
-            tbTeacher.setClassRoomId(aClass.getClassRoomId());
-            tbTeacher.setStart(aClass.getStart());
-            tbTeacher.setClassRoomName(aClass.getName());
-            tbTeacher.setEnd(aClass.getFinish());
-            this.timeTableRepository.save(tbTeacher);
-            for (Class_Student student : aClass.getClassStudents()) {
-                TimeTable tbStudent = new TimeTable();
-                tbStudent.setPerson(student.getStudent());
-                tbStudent.setStart(aClass.getStart());
-                tbStudent.setEnd(aClass.getFinish());
-                tbStudent.setClassRoomName(aClass.getName());
-                tbStudent.setRoomId(aClass.getRoom().getRoomId());
-                tbStudent.setClassRoomId(aClass.getClassRoomId());
-                tbStudent.setSemesterGroupId(aClass.getCourseSemesterGroup().getSemesterGroup().getSemesterGroupId());
-                tbStudent.setTeacherId(aClass.getTeacher().getPersonId());
-                this.timeTableRepository.save(tbStudent);
-//            System.out.println(aClass.getClassRoomId());
+        List<Semester_Group> semester_group = this.semesterGroupRepository.FindSemesterGroupByNowTime(date.toString());
+        for (Semester_Group group:semester_group)
+        {
+            System.out.println("Câp Nhat tai ngay: " + date + "//" + group.getSemesterGroupId());
+            List<Class> classList = this.classRepository.getAllClassBySemesterId(group.getSemesterGroupId());
+            for (Class aClass : classList) {
+                TimeTable tbTeacher = new TimeTable();
+                tbTeacher.setPerson(aClass.getTeacher());
+                tbTeacher.setSemesterGroupId(aClass.getSemesterGroupId());
+                tbTeacher.setRoomId(aClass.getRoom().getRoomId());
+                tbTeacher.setClassRoomId(aClass.getClassRoomId());
+                tbTeacher.setStart(aClass.getStart());
+                tbTeacher.setClassRoomName(aClass.getName());
+                tbTeacher.setEnd(aClass.getFinish());
+                this.timeTableRepository.save(tbTeacher);
+                for (Class_Student student : aClass.getClassStudents()) {
+                    TimeTable tbStudent = new TimeTable();
+                    tbStudent.setPerson(student.getStudent());
+                    tbStudent.setStart(aClass.getStart());
+                    tbStudent.setEnd(aClass.getFinish());
+                    tbStudent.setClassRoomName(aClass.getName());
+                    tbStudent.setRoomId(aClass.getRoom().getRoomId());
+                    tbStudent.setClassRoomId(aClass.getClassRoomId());
+                    tbStudent.setSemesterGroupId(aClass.getCourseSemesterGroup().getSemesterGroup().getSemesterGroupId());
+                    tbStudent.setTeacherId(aClass.getTeacher().getPersonId());
+                    this.timeTableRepository.save(tbStudent);
+                }
             }
-            semester_group.setActive(false);
-
-            this.semesterGroupRepository.save(semester_group);
         }
+
+
+
     }
 }
+

@@ -22,11 +22,11 @@ public interface SemesterGroupRepository extends JpaRepository<Semester_Group,St
             "FROM\n" +
             "    db_e_learningtlu.semester_group\n" +
             "WHERE\n" +
-            "    finish BETWEEN :start AND :finish ;", nativeQuery = true)
+            "    finish BETWEEN :start AND :finish or start between :start and :finish ;", nativeQuery = true)
     Optional<List<Semester_Group>>FindSemesterGroupByTime(@Param("start") String s,@Param("finish") String f );
 
-    @Query(value = "SELECT * FROM db_e_learningtlu.semester_group where time_dang_ky_hoc =:time ;", nativeQuery = true)
-    Optional<Semester_Group>FindSemesterGroupByNowTime(@Param("time") String time);
+    @Query(value = "SELECT * FROM db_e_learningtlu.semester_group where time_dang_ky_hoc =:time or finish=:time ;", nativeQuery = true)
+    List<Semester_Group>FindSemesterGroupByNowTime(@Param("time") String time);
 
     @Query(value = "SELECT * FROM db_e_learningtlu.semester_group where group_id=:group and time_dang_ky_hoc=:date",nativeQuery = true)
     Optional<Semester_Group> findSemesterGroupByGroupAndTime(@Param("group") String group,@Param("date") String date);

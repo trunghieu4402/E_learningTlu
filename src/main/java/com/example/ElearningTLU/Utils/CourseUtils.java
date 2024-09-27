@@ -79,7 +79,7 @@ public class CourseUtils {
     public List<CourseSemesterGroupResponse>getRegisterCourse(Student student)
     {
         List<CourseSemesterGroupResponse> list= new ArrayList<>();
-        LocalDate now = LocalDate.of(2024,9,10);
+        LocalDate now = LocalDate.of(2025,1,5);
 //        now=LocalDate.now();
 
         //Lay danh sach nhung mon ma SV da hoc

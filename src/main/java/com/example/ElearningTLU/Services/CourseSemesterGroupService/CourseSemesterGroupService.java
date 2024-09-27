@@ -74,17 +74,20 @@ public class CourseSemesterGroupService implements CourseSemesterGroupServiceImp
     }
     public List<CourseSemesterGroupResponse> courseSemesterGroupDtoList(String id)
     {
+
         List<CourseSemesterGroupResponse> list = new ArrayList<>();
         this.courseSemesterGroupRepository.findBySemesterGroupId(id).get().forEach(courseSemesterGroup ->
         {
+
             CourseSemesterGroupResponse dto = new CourseSemesterGroupResponse();
             dto.setId(courseSemesterGroup.getCourseSemesterGroupId());
             dto.setCourseId(courseSemesterGroup.getCourse().getCourseId());
             dto.setSemesterGroupId(courseSemesterGroup.getSemesterGroup().getSemesterGroupId());
             dto.setCourseName(courseSemesterGroup.getCourse().getCourseName());
             for(int i = 0; i<courseSemesterGroup.getClassList().size(); i++)
-            {
+            {      List<Integer> seat = new ArrayList<>();
                 ClassRoomDtoResponse classRoomDto = new ClassRoomDtoResponse();
+//                classRoomDto.setMaxSlot(Math.max(courseSemesterGroup.getClassList().get(i).getRoom().getSeats(),));
                 classRoomDto.setClassRoomId(courseSemesterGroup.getClassList().get(i).getClassRoomId());
                 LichHocResponse lichHoc = new LichHocResponse();
                 TeacherResponse teacherResponse = new TeacherResponse();
@@ -93,7 +96,9 @@ public class CourseSemesterGroupService implements CourseSemesterGroupServiceImp
                 lichHoc.setStart(courseSemesterGroup.getClassList().get(i).getStart());
                 lichHoc.setFinish(courseSemesterGroup.getClassList().get(i).getFinish());
                 lichHoc.setRoomId(courseSemesterGroup.getClassList().get(i).getRoom().getRoomId());
+                seat.add(courseSemesterGroup.getClassList().get(i).getRoom().getSeats());
                 classRoomDto.getLichHocList().add(lichHoc);
+                classRoomDto.setCurrentSlot(courseSemesterGroup.getClassList().get(i).getCurrentSlot());
                 for(int j = i+1; j<courseSemesterGroup.getClassList().size(); j++)
                 {
 
@@ -107,11 +112,25 @@ public class CourseSemesterGroupService implements CourseSemesterGroupServiceImp
                         lichHocResponse.setStart(courseSemesterGroup.getClassList().get(j).getStart());
                         lichHocResponse.setFinish(courseSemesterGroup.getClassList().get(j).getFinish());
                         lichHocResponse.setRoomId(courseSemesterGroup.getClassList().get(j).getRoom().getRoomId());
+                        seat.add(courseSemesterGroup.getClassList().get(j).getRoom().getSeats());
                         classRoomDto.getLichHocList().add(lichHocResponse);
                         i+=1;
                     }
 
                 }
+                int min =0;
+                for(int h=0;h<seat.size();h++)
+                {
+                    min = seat.get(h);
+                    for (int j=h;j<seat.size();j++)
+                    {
+                        if(min>seat.get(j))
+                        {
+                            min=seat.get(j);
+                        }
+                    }
+                }
+                classRoomDto.setMaxSlot(min);
 
                 dto.getClassRoomDtos().add(classRoomDto);
             }

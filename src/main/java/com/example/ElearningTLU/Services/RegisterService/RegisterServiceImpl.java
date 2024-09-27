@@ -2,12 +2,14 @@ package com.example.ElearningTLU.Services.RegisterService;
 
 import com.example.ElearningTLU.Dto.Response.ClassRoomDtoResponse;
 import com.example.ElearningTLU.Dto.Response.CourseSemesterGroupResponse;
+import com.example.ElearningTLU.Dto.Response.RegisterClassResponse;
 import com.example.ElearningTLU.Entity.*;
 import com.example.ElearningTLU.Entity.Class;
 import com.example.ElearningTLU.Repository.*;
 import com.example.ElearningTLU.Utils.CourseUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -39,12 +41,12 @@ public class RegisterServiceImpl implements RegisterService{
         LocalDate now = LocalDate.now();
         Person person = this.personRepository.findByUserNameOrPersonId(personId).get();
         Student student = this.mapper.map(person,Student.class);
-        if(this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),"2024-09-10").isEmpty())
+        if(this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),now.toString()).isEmpty())
         {
             return new ResponseEntity<>("Ban khong thuoc doi tuong duoc dang Ky Hoc Ngay Hom Nay",HttpStatus.BAD_REQUEST);
         }
 
-        Semester_Group semesterGroup = this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),"2024-09-10").get();
+        Semester_Group semesterGroup = this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),now.toString()).get();
         List<Class> aClasses = new ArrayList<>();
         //Lay Danh Sach ClassRoom trong Ky hien tai trong danh sach nhung mon dc phep dk
         List<CourseSemesterGroupResponse> courseSemesterGroups = this.courseUtils.getRegisterCourse(student);
@@ -123,14 +125,19 @@ public class RegisterServiceImpl implements RegisterService{
             }
             return new ResponseEntity<>("Thoi Gian Dang Ky Lop Trung",HttpStatus.BAD_REQUEST);
         }
+        RegisterClassResponse response= new RegisterClassResponse();
         for (Class aClass : aClasses)
         {
+
 //                    ClassRoom_Student roomStudent = new ClassRoom_Student();
                     aClass.setCurrentSlot(aClass.getCurrentSlot()+1);
                     aClass =this.classRepository.save(aClass);
+                    response.setClassId(aClass.getClassRoomId());
+                    response.setCurrentStudent(aClass.getCurrentSlot());
                     this.addStudentToClass(aClass,student);
         }
-        return new ResponseEntity<>("Dang Ky thanh Cong",HttpStatus.OK);
+
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
     //Check thoi gian dk hoc
     public boolean CheckStudentSchedule(List<Class> aClasses, Student student, Semester_Group semesterGroup)
@@ -197,7 +204,7 @@ public class RegisterServiceImpl implements RegisterService{
         Student student= this.mapper.map(this.personRepository.findByUserNameOrPersonId(userId).get(),Student.class);
         LocalDate date = LocalDate.now();
 
-        Semester_Group semesterGroup = this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),"2024-09-10").get();
+        Semester_Group semesterGroup = this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),date.toString()).get();
         List<Class> classStudents = this.getAllClassRoomWereRegister(student,semesterGroup);
         List<ClassRoomDtoResponse> list=courseUtils.convertToClassRoomResponse(classStudents);
         return new ResponseEntity<>(list,HttpStatus.OK);
@@ -220,8 +227,9 @@ public class RegisterServiceImpl implements RegisterService{
     //Hủy mon
     public ResponseEntity<?> removeClassRoom(String userId,String classRoomId)
     {
+        LocalDate date= LocalDate.now();
         Student student= this.mapper.map(this.personRepository.findByUserNameOrPersonId(userId).get(),Student.class);
-        Semester_Group semesterGroup = this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),"2024-09-10").get();
+        Semester_Group semesterGroup = this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),date.toString()).get();
 //        List<> preSchedule = this.preScheduleRepository.findByStudentIdAndSemesterGroup(student.getPersonId(),semesterGroup.getSemesterGroupId());
         List<Class> aClasses = this.getAllClassRoomWereRegister(student,semesterGroup);
         boolean check= true;
@@ -242,5 +250,16 @@ public class RegisterServiceImpl implements RegisterService{
             return new ResponseEntity<>("Khong the huy mon ma ban chua dang ky",HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("Huy Mon thanh cong",HttpStatus.OK);
+    }
+    public boolean checkRegisterTime(String userId)
+    {
+        LocalDate now = LocalDate.now();
+        Person person = this.personRepository.findByUserNameOrPersonId(userId).get();
+        Student student = this.mapper.map(person,Student.class);
+        if(this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),now.toString()).isEmpty())
+        {
+            return false;
+        }
+        return true;
     }
 }

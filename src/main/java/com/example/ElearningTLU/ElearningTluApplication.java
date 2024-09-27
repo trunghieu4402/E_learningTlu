@@ -70,11 +70,6 @@ public class ElearningTluApplication {
 		this.UpdateData();
 				this.UpdateNganh();
 		this.updateMonHoc();
-//
-//		System.out.println(calculateDelayToMidnight());
-//		long period = 10000;
-//		Timer timer = new Timer();
-//		timer.scheduleAtFixedRate(new DailyTask(),calculateDelayToMidnight(),period);
 		this.AutoUpdate();
 
 	}

@@ -9,7 +9,8 @@ public interface SemesterGroupServiceImpl {
     public ResponseEntity<?> getSemesterGroupById(String id);
     public ResponseEntity<?> deleteSemesterGroupById(String id);
     public ResponseEntity<?> updateSemesterGroup(SemesterGroupRequest semesterGroupRequest);
-    public void AutoUpdate();
+    public void UpdateSemester();
+    public void UpdateTimeTable();
     public ResponseEntity<?> getAllSemesterGroupIsNonActive();
 
 }

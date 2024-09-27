@@ -6,7 +6,7 @@ import lombok.Data;
 public class SemesterGroupRequest {
     private String SemesterGroupId;
 //    private String SemesterID;
-    private String GroupID;
+    private String GroupId;
     private float  BaseCost;
     private String start;
     private String end;

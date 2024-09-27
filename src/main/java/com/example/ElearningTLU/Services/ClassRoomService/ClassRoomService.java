@@ -74,6 +74,14 @@ public class ClassRoomService implements ClassRoomServiceImpl{
         n+=1;
         Course_SemesterGroup courseSemesterGroup = this.courseSemesterGroupRepository.findById(classRequest.getCourseSemesterGroupId()).get();
         for(LichHocRequest lichHocRequest : classRequest.getLichHocRequestList()) {
+            if(lichHocRequest.getTeacher().isEmpty())
+            {
+                return new ResponseEntity<>("Vui Lòng Chọn Giáo Viên ",HttpStatus.BAD_REQUEST);
+            }
+            if(lichHocRequest.getRoomId().isEmpty())
+            {
+                return  new ResponseEntity<>("Vui Lòng Chọn Phòng Học",HttpStatus.BAD_REQUEST);
+            }
             if (!CheckTime(lichHocRequest.getStart(), lichHocRequest.getFinish())) {
                 return new ResponseEntity<>("Thoi Gian mo Lop khong hop Ly", HttpStatus.BAD_REQUEST);
             }

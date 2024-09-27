@@ -35,7 +35,7 @@ public class Semester_Group {
     private LocalDate finish;
 
     private LocalDate timeDangKyHoc;
-    private boolean active;
+    private SemesterGroupStatus status;
 
     @OneToMany(mappedBy = "semesterGroup",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     List<Course_SemesterGroup> courseSemesterList = new ArrayList<>();

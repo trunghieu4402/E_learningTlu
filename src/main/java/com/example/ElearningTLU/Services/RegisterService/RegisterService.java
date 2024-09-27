@@ -9,5 +9,6 @@ public interface RegisterService {
     public ResponseEntity<?> getPreSchedule(String userId);
 
     public ResponseEntity<?> removeClassRoom(String userId,String classRoomId);
+    public boolean checkRegisterTime(String userId);
 
 }

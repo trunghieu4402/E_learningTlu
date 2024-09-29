@@ -34,6 +34,7 @@ public class SemesterGroupService implements SemesterGroupServiceImpl{
 
     @Autowired
             private ClassRepository classRepository;
+    LocalDate date = LocalDate.now();
     ModelMapper mapper = new ModelMapper();
     public ResponseEntity<?> addSemesterGroup(SemesterGroupRequest semesterGroupRequest)
     {
@@ -182,7 +183,7 @@ public class SemesterGroupService implements SemesterGroupServiceImpl{
         return new ResponseEntity<>(this.semesterGroupRepository.getAllSemesterGroupByActive(false),HttpStatus.OK);
     }
     public void UpdateSemester() {
-        LocalDate date = LocalDate.now();
+
         System.out.println(date);
         if (this.semesterGroupRepository.FindSemesterGroupByNowTime(date.toString()).isEmpty()) {
             return;

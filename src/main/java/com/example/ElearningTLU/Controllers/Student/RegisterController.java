@@ -25,13 +25,13 @@ public boolean checkRegisterTime()
     String person = this.token.getUser();
     return this.registerService.checkRegisterTime(person);
 }
-    @MessageMapping("/register")
-    @SendTo("/topic/ classUpdates")
-    public ResponseEntity<?> register(@RequestParam("id") String classroomId)
-    {
-        String person = this.token.getUser();
-        return this.registerService.register(person,classroomId);
-    }
+//    @MessageMapping("/register")
+//    @SendTo("/topic/ classUpdates")
+//    public ResponseEntity<?> register(@RequestParam("id") String classroomId)
+//    {
+//        String person = this.token.getUser();
+//        return this.registerService.register(person,classroomId);
+//    }
     @MessageMapping("/hi")
     @SendTo("/topic/updates")
     public String chat()

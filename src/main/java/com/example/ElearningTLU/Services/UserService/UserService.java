@@ -135,7 +135,7 @@ public class UserService implements UserServiceImpl{
         this.ThemThongKe(student);
 
         //Them +1 vao so luong sinh vien phai hoc cac mon
-        this.sendNotification(student.getUserName(),student.getPersonId(),student.getEmail());
+        this.sendNotification(student.getUsername(),student.getPersonId(),student.getEmail());
         return new ResponseEntity<>(student, HttpStatus.OK);
 
 
@@ -185,7 +185,7 @@ public class UserService implements UserServiceImpl{
         Student student= this.mapper.map(person,Student.class);
 
 
-        String username =student.getUserName();
+        String username =student.getUsername();
         String password = student.getPassword();
 
 //        Generation generation = this.generationRepository.findById(.getGeneration().getGenerationID()).get();

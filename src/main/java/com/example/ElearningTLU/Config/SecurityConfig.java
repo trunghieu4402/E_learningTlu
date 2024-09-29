@@ -50,6 +50,7 @@ public class SecurityConfig   {
                  oauthen.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
          );
          http.csrf(AbstractHttpConfigurer::disable);
+          http.cors(AbstractHttpConfigurer::disable);
 
 //         http.csrf().disable();
         return http.build();

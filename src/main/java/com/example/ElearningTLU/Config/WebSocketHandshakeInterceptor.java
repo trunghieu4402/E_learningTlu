@@ -1,7 +1,10 @@
 package com.example.ElearningTLU.Config;
 
+import com.example.ElearningTLU.Utils.JWTToken;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +19,8 @@ import org.slf4j.LoggerFactory;
 @RequiredArgsConstructor
 
 public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
+    @Autowired
+    private JWTToken token;
     private static final Logger logger = LoggerFactory.getLogger(WebSocketHandshakeInterceptor.class);
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
@@ -29,8 +34,9 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             String jwtToken = authHeader.substring(7);  // Loại bỏ 'Bearer ' để lấy token
 
             // Thực hiện kiểm tra token
-            if (validateToken(jwtToken)) {
-                attributes.put("user", getUserFromToken(jwtToken));  // Lưu thông tin user
+            if (token.validateToken(jwtToken)) {
+                Claims claims=token.extractClaims(jwtToken);
+                attributes.put("user", claims.getSubject());  // Lưu thông tin user
                 return true;  // Token hợp lệ, cho phép kết nối
             }
         }

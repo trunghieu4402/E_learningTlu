@@ -8,12 +8,15 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import lombok.Data;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.security.SignatureException;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -23,6 +26,25 @@ public final class JWTToken {
     @NonFinal
     @Value("${signerKey}")
     public String SIGNER_KEY;
+    public Claims extractClaims(String token) throws SignatureException {
+        return Jwts.parser()
+                .setSigningKey(SIGNER_KEY)
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    public String extractUsername(String token) throws SignatureException {
+        return this.extractClaims(token).getSubject();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            extractClaims(token);
+            return true;
+        } catch (SignatureException e) {
+            return false;
+        }
+    }
 
     public String getUser()
     {
@@ -33,7 +55,7 @@ public final class JWTToken {
     public String generateToken(Person person) {
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(person.getUserName())
+                .subject(person.getUsername())
                 .claim("UserId", person.getPersonId())
                 .issuer("thanglong.com")
                 .issueTime(new Date())

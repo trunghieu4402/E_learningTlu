@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
+@Component
 public class TotorialHander extends TextWebSocketHandler {
     private List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
     private final JwtDecoder jwtDecoder;
@@ -24,7 +26,7 @@ public class TotorialHander extends TextWebSocketHandler {
         this.jwtDecoder = jwtDecoder;
     }
     @Autowired
-    private RegisterServiceImpl registerService;
+    private RegisterServiceImpl registerService= new RegisterServiceImpl();
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessions.add(session);
@@ -51,13 +53,15 @@ public class TotorialHander extends TextWebSocketHandler {
 
                 // Sử dụng thông tin từ token (ví dụ: user id, roles)
                 String userId = decodedToken.getSubject();
+
               ResponseEntity<?> a = this.registerService.register(userId,clientMessage);
 //                System.out.println("User ID: " +userId);
 
                 // Tiếp tục xử lý tin nhắn sau khi xác thực token (nếu cần)
                 for(WebSocketSession s :sessions)
                 {
-                    s.sendMessage(new TextMessage(a.toString()));
+                    s.sendMessage(new TextMessage(userId+ " gui request" +a.toString()));
+//                    s.sendMessage(new TextMessage(a.toString()));
                 }
 
 
@@ -74,7 +78,6 @@ public class TotorialHander extends TextWebSocketHandler {
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
 
     }
-
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
 

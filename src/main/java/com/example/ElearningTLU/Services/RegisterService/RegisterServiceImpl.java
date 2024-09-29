@@ -32,21 +32,22 @@ public class RegisterServiceImpl implements RegisterService{
             private TimeTableRepository timeTableRepository;
     @Autowired
             private ClassRoomStudentRepository classRoomStudentRepository;
+    private LocalDate date=LocalDate.of(2025,1,5);
 
 
     ModelMapper mapper = new ModelMapper();
     // Dang ky hoc
     public ResponseEntity<?> register(String personId, String classroom)
     {
-        LocalDate now = LocalDate.now();
+//        LocalDate now = LocalDate.now();
         Person person = this.personRepository.findByUserNameOrPersonId(personId).get();
         Student student = this.mapper.map(person,Student.class);
-        if(this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),now.toString()).isEmpty())
+        if(this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),date.toString()).isEmpty())
         {
             return new ResponseEntity<>("Ban khong thuoc doi tuong duoc dang Ky Hoc Ngay Hom Nay",HttpStatus.BAD_REQUEST);
         }
 
-        Semester_Group semesterGroup = this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),now.toString()).get();
+        Semester_Group semesterGroup = this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),date.toString()).get();
         List<Class> aClasses = new ArrayList<>();
         //Lay Danh Sach ClassRoom trong Ky hien tai trong danh sach nhung mon dc phep dk
         List<CourseSemesterGroupResponse> courseSemesterGroups = this.courseUtils.getRegisterCourse(student);
@@ -61,7 +62,6 @@ public class RegisterServiceImpl implements RegisterService{
                     list.add(courseSemesterGroup);
                 }
             }
-
         }
         //lay lop muon dk
         for(Course_SemesterGroup courseSemesterGroup: list )
@@ -253,10 +253,10 @@ public class RegisterServiceImpl implements RegisterService{
     }
     public boolean checkRegisterTime(String userId)
     {
-        LocalDate now = LocalDate.now();
+
         Person person = this.personRepository.findByUserNameOrPersonId(userId).get();
         Student student = this.mapper.map(person,Student.class);
-        if(this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),now.toString()).isEmpty())
+        if(this.semesterGroupRepository.findSemesterGroupByGroupAndTime(student.getGroup().getGroupId(),date.toString()).isEmpty())
         {
             return false;
         }
